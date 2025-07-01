@@ -1,1 +1,1 @@
-# LCM1602C
+# LiquidCrystal
