@@ -46,6 +46,12 @@ void LiquidCrystal::init(uint16_t rs, uint16_t rw, uint16_t en, uint16_t db0, ui
     this->db5 = db5;
     this->db6 = db6;
     this->db7 = db7;
+    // Data direction
+    // rs, rw, en
+
+
+    //PORTD
+
 }
 
 void LiquidCrystal::begin(uint16_t cols, uint16_t rows) {
@@ -53,41 +59,79 @@ void LiquidCrystal::begin(uint16_t cols, uint16_t rows) {
     _delay_ms(50);
 
     // Function Set
-    rs 0
-    rw 0
-    DB 00111000
+        // rs 0
+    setPin(PORTD, rs, 0);
+        // rw 0
+    setPin(PORTD, rw, 0);
+        // DB 00111000
+    PORTD = 0x38;
+
 
     // wait for more than 4.1 ms
     _delay_us(6);
 
     // Function Set
+    setPin(PORTD, rs, 0);
+    setPin(PORTD, rw, 0);
+    PORTD = 0x38;
 
     // wait for more than 100 microSeconds
     _delay_us(110);
 
     // Function Set
-
+    setPin(PORTD, rs, 0);
+    setPin(PORTD, rw, 0);
+    PORTD = 0x38;
 
     // Specify the number of display lines and character font.
-
+    // 0 0 1 1 1 0 0 0
+    PORTD = 0x38;
 
     // Display off
-
+    PORTD = 0x08;
 
     // Display Clear
-
+    PORTD = 0x01;
 
     // Entry mode set
+    //0 0 0 0 0 1 I/D S
+    // 0000 0110
+    PORTD = 0x06;
+}
 
+// write the data register, Page 32
+void LiquidCrystal::write(char* arry) {
+    //check busy flag
 
+    // select register, need 1 for data register
+    setPin(PORTD, rs, 1);
 
+    // set read/write pin, 0 for write
+    setPin(PORTD, rw, 0);
 
+    setPin(PORTD, en, 1);
+
+    uint8_t i = 0;
+    while (arry[i] != '\0') {
+        PORTD = arry[i];
+        i++;
+        setPin(PORTD, en, 0);
+        setPin(PORTD, rw, 1);
+
+        setPin(PORTD, en, 1);
+        // check busy flag
+        uint8_t busyFlag  = (PIND & (1 << DB7);
+        while ( busyFlag ) {
+            _delay_ms(1);
+            busyFlag = (PIND & (1 << DB7);
+        }
+    }
 
 }
 
 /*RS - Function selects registers
  * 0 - Instruction register (for write) Busy Flag address counter (for read)
- *  1 - Data Register (for write and read)
+ * 1 - Data Register (for write and read)
  */
 
 /* R/W - Selects read or write
@@ -141,12 +185,14 @@ Check the busy flag before sending an instruction from the MPU */
  * Function     0   0   0   0   1   DL  N   F   -   -
  * Set
  *
- *
+ * ID =1: Increment
+ * ID =0: Decrement
+ * S =1: Accompanies display shift
  * DL = 1: 8 bits DL = 0: 4 bits
  * N = 1: 2 lines, N = 0: 1 line
  * F = 1: 5 x 10 dots, F = 0: 5 x 8 dots
  * BF = 1: Internally operating
- * BF = 0: INstructions accepatable
+ * BF = 0: Instructions accepatable
  * D display
  * C cursor
  * B blinking of cursor position character
@@ -166,8 +212,14 @@ Timing Diagram
     Page 58
 */
 
-void setPin(volatile uint8_t *port, uint8_t pin, uint8_t value)
-*port |= (1 << pin); // Set the pin high
-*port &= ~(1 << pin); // Set the pin low
+void setPin(volatile uint8_t *port, uint8_t pin, uint8_t value) {
+    if (value == 1) {
+        *port |= (1 << pin); // Set the pin high
+    }
+    else {
+        *port &= ~(1 << pin); // Set the pin low
+    }
+}
 
-01001101
+
+//01001101

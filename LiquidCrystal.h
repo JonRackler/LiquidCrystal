@@ -46,6 +46,7 @@ private:
     void init(uint16_t rs, uint16_t rw, uint16_t en, uint16_t db0, uint16_t db1, uint16_t db2,
          uint16_t db3, uint16_t db4, uint16_t db5, uint16_t db6, uint16_t db7);
     void begin(uint16_t cols, uint16_t rows);
+    void write(char* arry);
 };
 
 #endif
