@@ -47,11 +47,11 @@ void LiquidCrystal::init(uint16_t rs, uint16_t rw, uint16_t en, uint16_t db0, ui
     this->db6 = db6;
     this->db7 = db7;
     // Data direction
-    // rs, rw, en
-
+    // rs, rw, en on PC0-PC2
+    DDRC = (1<<DDC2)|(1<<DDC1) |(1<<DDC0);
 
     //PORTD
-
+    DDRD = 0xFF;
 }
 
 void LiquidCrystal::begin(uint16_t cols, uint16_t rows) {
